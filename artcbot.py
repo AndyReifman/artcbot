@@ -26,12 +26,25 @@ def write_out(input_string,input_array):
 command_list = get_array("command_list")
 last_edit = get_array("last_edit")
 jd_paces = get_array("jd_paces")
+pf_paces = get_array("pf_paces")
+han_paces = get_array("han_paces")
 #Defining built in commands
 built_in = ["add","edit","delete","vdot","planner","pacing","splits","convertpace","convertdistance"]
+#Need to do this better
 temp_array=[]
 for i in jd_paces:
     temp_array.append(i.split(','))
 jd_paces = temp_array[1:]
+temp_array=[]
+for i in pf_paces:
+    temp_array.append(i.split(','))
+pf_paces = temp_array[1:]
+temp_array=[]
+for i in han_paces:
+    temp_array.append(i.split(','))
+han_paces = temp_array[1:]
+#Defining VDOT ranges.
+vdot_range=[30.0,85.0]
 
 #Return date to start training
 def planner(date,time):
@@ -224,7 +237,10 @@ def help(comment_list):
     return reply
 
 #Paces based on VDOT
-def training(comment_list):
+#Not done, needs pf and han added. 
+#Also needs to not be shit
+def trainingpaces(comment_list):
+    reply = ""
     indices = [i for i, x in enumerate(comment_list) if x == "!trainingpaces"]
     for i in indices:
         if(len(comment_list) > 2):
@@ -238,13 +254,23 @@ def training(comment_list):
                 v_dot = str(round(v_dot,0))
             else:
                 v_dot = str(round(float(comment_list[i+1]),0))
+            reply += "\n\n For a "+v_dot+" VDOT here are training paces from popular books."
             for j in range(0,len(jd_paces)-1,1):
                 if(jd_paces[j][0]+'.0' == v_dot):
                     #Reddit table formatting
-                    reply += "\n\n For a "+v_dot+" VDOT here are training paces from popular books."
                     reply += "\n\n **Jack Daniels:**\n\nEasy/Long | Marathon | Tempo | Interval | Repetition"
                     reply += "\n -- | -- | -- | -- | --"
                     reply += "\n"+jd_paces[j][1]+"-"+jd_paces[j][2]+" | "+jd_paces[j][3]+" | "+jd_paces[j][4]+" | "+jd_paces[j][5]+" | "+jd_paces[j][6]
+            for j in range(0,len(pf_paces)-1,1):
+                if(pf_paces[j][0]+'.0' == v_dot):
+                    reply += "\n\n **Pete Pfitzinger:**\n\nLong run | Long run (km) | LT | LT (km)  | VO2 (400) | Speed (300) | Speed (200)"
+                    reply += "\n -- | -- | -- | -- | -- | -- | -- "
+                    reply += "\n"+pf_paces[j][1]+"-"+pf_paces[j][2]+" | "+pf_paces[j][3]+"-"+pf_paces[j][4]+" | "+pf_paces[j][5]+" | "+pf_paces[j][6]+" | "+pf_paces[j][7]+" | "+pf_paces[j][8]+" | "+pf_paces[j][9]
+            for j in range(0,len(han_paces)-1,1):
+                if(han_paces[j][0]+'.0' == v_dot):
+                    reply += "\n\n **Hanson's**\n\nRecovery | Easy | Long Run | Marathon | Strength | 10k | 5k"
+                    reply += "\n -- | -- | -- | -- | -- | -- | --"
+                    reply += "\n"+han_paces[j][1]+" | "+han_paces[j][2]+"-"+han_paces[j][3]+" | "+han_paces[j][4]+" | "+han_paces[j][5]+" | "+han_paces[j][6]+" | "+han_paces[j][7]+" | "+han_paces[j][8]
             if(float(v_dot) < min(vdot_range) or float(v_dot) > max(vdot_range)):
                 reply += "\n\nThere are no listed training paces for a "+v_dot+" VDOT."
     return reply
