@@ -3,7 +3,10 @@
 #ARTCbot. Responds to ! commands 
 #To do list:
 #1 - Calendar integration? !upcoming <user> and !upcoming 
-#2 - Training paces from popular books. Pfitz, JD, Hansons, Lore of Running.
+#2 - Age grading
+#3 - Race prediction from vdot
+#4 - New way to parse distance/unit
+#5 - Make !trainingpaces not shit
 
 import artcbot
 import praw
@@ -23,8 +26,6 @@ command_list = artcbot.get_array("command_list")
 
 #Defining built in commands
 built_in = ["add","edit","delete","vdot","planner","pacing","splits","convertpace","convertdistance","trainingpaces"]
-#Defining VDOT ranges. Probably don't need this in reddit.
-vdot_range=[30.0,85.0]
 
 print("\n * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * \n")
 
@@ -120,8 +121,10 @@ def main():
                     unit = comment_list[i+3].lower()
                     reply += "\n\n"+artcbot.convert(time, distance, unit, comment_list[i+1], "!vdot")
 
-               
-            ########################################
+            if(comment.body.count("!trainingpaces")):
+                reply += artcbot.trainingpaces(comment_list)
+
+            #Responding if needed
             if(len(reply) > 1):
                 comment.reply(reply)
 

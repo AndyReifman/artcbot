@@ -4,6 +4,7 @@
 #To do list:
 #1 - Calendar integration? !upcoming <user> and !upcoming 
 #2 - Training paces from popular books. Pfitz, JD, Hansons, Lore of Running.
+#3 - Race predictor. Should be same as the age grading. Just parse that website.
 
 import codecs
 from datetime import datetime, timedelta
@@ -46,6 +47,29 @@ han_paces = temp_array[1:]
 #Defining VDOT ranges.
 vdot_range=[30.0,85.0]
 
+#Parsing distances and units
+def parseDistance(orig):
+    dist = 0
+    unit = 'na'
+
+    ary = orig.split()
+
+    if (len(ary) == 1):
+        m = re.match(r'([0-9.]+)([A-Za-z]+)', ary[0])
+        if m:
+            dist = float(m.group(1))
+            unit = m.group(2)
+    elif (len(ary) == 2):
+        dist = float(ary[0])
+        unit = ary[1]
+
+    if (unit.startswith(('km', 'ki')) or unit == 'k'):
+        unit = 'kilometer'
+    elif (unit.startswith('mi')):
+        unit = 'mile'
+
+    return [dist, unit]
+
 #Return date to start training
 def planner(date,time):
     formatting = date.split('/')
@@ -78,7 +102,7 @@ def time_format(time):
 def VDOT(time, distance):
     num = -4.6+0.182258*(distance*1e3/time)+0.000104*(distance*1e3/time)**2
     denom = 0.8+0.1894393*exp(-0.012778*time)+0.2989558*exp(-0.1932605*time)
-    return round(num/denom,1)
+    return round(num/denom,2)
 
 #Conversion function
 #Time in minutes as a float, distance as a float, unit as a string, inputs as a string, string is obvious.
@@ -237,8 +261,7 @@ def help(comment_list):
     return reply
 
 #Paces based on VDOT
-#Not done, needs pf and han added. 
-#Also needs to not be shit
+#Needs to not be shit
 def trainingpaces(comment_list):
     reply = ""
     indices = [i for i, x in enumerate(comment_list) if x == "!trainingpaces"]
