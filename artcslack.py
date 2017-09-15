@@ -30,7 +30,10 @@ def parseDistance(orig):
     dist = 0
     unit = 'na'
 
-    ary = orig.split()
+    if (type(orig) == str):
+        ary = orig.split()
+    else:
+        ary = orig
 
     if (len(ary) == 1):
         m = re.match(r'([0-9.]+)([A-Za-z]+)', ary[0])
@@ -50,7 +53,6 @@ def parseDistance(orig):
 
 
 if sc.rtm_connect():
-    print "Running. . ."
     while True:
         new_events = sc.rtm_read()
         for events in new_events:
@@ -105,18 +107,13 @@ if sc.rtm_connect():
                     command = message[0]
                     message = artcbot.planner(message[1],message[2])
                     sendMessage(user, channel, message)
-#                elif events["text"].startswith(("!trainingpaces")):
-#                    channel = getChannel(events)
-#                    user = getUser(events)
-#                    message = events["text"].split(' ')
-#                    message = artcbot.trainingpaces(message)
-#                    sendMessage(user, channel, message)
                 #Has to be last elif
                 elif events["text"].startswith("!"):
                     channel = getChannel(events)
                     user = getUser(events)
                     message = events["text"].split(' ')
-                    index = command_list.index(message[0])
+                    command = message[0]
+                    index = command_list.index(command)
                     message = codecs.decode(command_list[index+1], 'unicode_escape')
                     sendMessage(user, channel, message)
         time.sleep(1)
